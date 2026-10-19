@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NODE</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="NODE">
+<meta name="theme-color" content="#b8452f">
+<script>
+  // ▼ ここに名刺アプリ（GAS）のURL（末尾が /exec）を貼り付ける
+  const APP_URL = 'https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbw1THJBDI-YepBslIcWDfHoKHM4_LDK3bAuWogH0zUbrd1wD8IykITSEmkCyvT30w/exec';
+
+  // ホーム画面のアイコンから開いたとき（URLに ?launch=1 が付いている）は、すぐに名刺アプリへ移動する
+  if (/[?&]launch=1/.test(location.search)) location.replace(APP_URL);
+</script>
+<style>
+  :root{--bg:#f3f5f8;--surface:#fff;--ink:#1b2333;--muted:#5d677a;--line:#dde2ea;--ai:#22406e;--shu:#b8452f}
+  @media (prefers-color-scheme: dark){:root{--bg:#12161e;--surface:#1b212c;--ink:#e7ebf2;--muted:#9aa4b6;--line:#2c3443;--ai:#8fb0e6;--shu:#e48a73}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","Yu Gothic UI","Meiryo",system-ui,sans-serif;line-height:1.7}
+  main{max-width:440px;margin:0 auto;padding:40px max(20px,env(safe-area-inset-left)) 40px max(20px,env(safe-area-inset-right));display:flex;flex-direction:column;gap:18px}
+  .logo{display:flex;align-items:center;gap:12px}
+  .logo img{width:56px;height:56px;border-radius:12px}
+  .logo b{font-size:28px;letter-spacing:.14em;font-weight:800;display:block;line-height:1.1}
+  .logo small{font-size:12px;color:var(--muted);letter-spacing:.08em}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .card h2{font-size:15px;margin:0 0 6px}
+  ol{margin:0;padding-left:1.3em}
+  .btn{display:block;text-align:center;background:var(--ai);color:#fff;text-decoration:none;font-weight:700;padding:14px;border-radius:999px}
+  .note{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+  <div class="logo"><img src="icon-192.png" alt=""><div><b>NODE</b><small>名刺・人脈管理</small></div></div>
+  <p style="margin:0">このページをホーム画面に追加すると、アイコンからNODEを開けるようになります。</p>
+  <div class="card">
+    <h2>iPhone（Safari）</h2>
+    <ol><li>画面下の共有ボタン（□に↑）を押す</li><li>「ホーム画面に追加」を選ぶ</li><li>名前が「NODE」になっていることを確認して「追加」</li></ol>
+  </div>
+  <div class="card">
+    <h2>Android（Chrome）</h2>
+    <ol><li>右上の「︙」を押す</li><li>「ホーム画面に追加」を選ぶ</li><li>名前が「NODE」になっていることを確認して「追加」</li></ol>
+  </div>
+  <a class="btn" id="open" href="#">追加せずにNODEを開く</a>
+  <p class="note">ホーム画面のアイコンから開くと、自動でNODEに移動します。</p>
+</main>
+<script>
+  document.getElementById('open').href = APP_URL;
+  // ホーム画面に追加されるURLに「?launch=1」を付けておく（アイコンから開いたときに自動で移動させるため）
+  try { history.replaceState(null, '', location.pathname + '?launch=1'); } catch (e) {}
+</script>
+</body>
+</html>
