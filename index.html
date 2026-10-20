@@ -13,7 +13,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="NODE">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" media-"(prefers-color-scheme:light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme:dark)" content="#1b212c">
 <script>
   // ▼▼▼ ここを書き換える：'' の中に、NODE（GAS）の /exec で終わるURLを丸ごと貼る ▼▼▼
   const APP_URL = 'https://script.google.com/macros/s/AKfycbw1THJBDI-YepBslIcWDfHoKHM4_LDK3bAuWogH0zUbrd1wD8IykITSEmkCyvT30w/exec';
@@ -97,6 +98,7 @@
     document.getElementById('guide').hidden = true;
     const app = document.getElementById('app');
     app.hidden = false;
+    　document.documentElement.style.background = document.body.style.background = 'var(--surface)';
     const f = document.createElement('iframe');
     f.src = APP_URL;
     f.title = 'NODE';
