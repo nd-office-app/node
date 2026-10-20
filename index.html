@@ -13,11 +13,11 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="NODE">
-<meta name="theme-color" media-"(prefers-color-scheme:light)" content="#ffffff">
-<meta name="theme-color" media="(prefers-color-scheme:dark)" content="#1b212c">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1b212c">
 <script>
   // ▼▼▼ ここを書き換える：'' の中に、NODE（GAS）の /exec で終わるURLを丸ごと貼る ▼▼▼
-  const APP_URL = 'https://script.google.com/macros/s/AKfycbw1THJBDI-YepBslIcWDfHoKHM4_LDK3bAuWogH0zUbrd1wD8IykITSEmkCyvT30w/exec';
+  const APP_URL = 'ここに /exec で終わるURLを丸ごと貼る';
   // ▲▲▲ 例：const APP_URL = 'https://script.google.com/macros/s/AKfy……/exec'; ▲▲▲
 
   // 表示のしかた
@@ -45,7 +45,11 @@
   .btn{display:block;text-align:center;background:var(--ai);color:#fff;text-decoration:none;font-weight:700;padding:14px;border-radius:999px}
   .note{font-size:12px;color:var(--muted)}
   /* 全画面表示 */
-  #app{position:fixed;inset:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);background:linear-gradient(ver(--surface)50%,var(--bg)50%)}
+  #app{position:fixed;inset:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);background:linear-gradient(var(--surface) 50%,var(--bg) 50%)}
+  /* NODEで下からシートが出たとき：上の帯を暗く、下の帯をシートと同じ色に */
+  #app::before{content:"";position:absolute;left:0;right:0;top:0;height:env(safe-area-inset-top);background:rgba(10,15,25,.45);opacity:0;transition:opacity .15s;pointer-events:none}
+  #app.dim{background:var(--surface)}
+  #app.dim::before{opacity:1}
   #app iframe{width:100%;height:100%;border:0;display:block}
   #app .loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#5d677a;font-size:13px;pointer-events:none}
   #app .loading img{width:64px;height:64px;border-radius:14px}
@@ -85,6 +89,14 @@
       let cred = null;
       try { cred = JSON.parse(localStorage.getItem(CRED_KEY) || 'null'); } catch (err) {}
       e.source.postMessage({ type: 'node-cred', cred }, e.origin);
+    } else if (e.data.type === 'node-dim') {
+      // Androidの上の帯（テーマの色）も合わせて暗くする
+      document.getElementById('app').classList.toggle('dim', !!e.data.on);
+      const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+      document.querySelectorAll('meta[name="theme-color"]').forEach(m => {
+        if (!m.dataset.base) m.dataset.base = m.content;
+        m.content = e.data.on ? (dark ? '#131923' : '#919397') : m.dataset.base;
+      });
     } else if (e.data.type === 'node-save') {
       try {
         if (e.data.cred) localStorage.setItem(CRED_KEY, JSON.stringify(e.data.cred));
@@ -98,7 +110,7 @@
     document.getElementById('guide').hidden = true;
     const app = document.getElementById('app');
     app.hidden = false;
-    　document.documentElement.style.background = document.body.style.background = 'var(--surface)';
+    document.documentElement.style.background = document.body.style.background = 'var(--surface)';
     const f = document.createElement('iframe');
     f.src = APP_URL;
     f.title = 'NODE';
