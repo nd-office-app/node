@@ -93,6 +93,8 @@
       // Androidの上の帯（テーマの色）も合わせて暗くする
       document.getElementById('app').classList.toggle('dim', !!e.data.on);
       const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+      //Iphoneは、時計・電池の帯をページの背景色で塗るので、その色を暗くする。
+      document.documentElement.style.background = document.body.style.background = e.date.on ? (dark ? '#131923' : '#919397') : 'var(--surface)';
       document.querySelectorAll('meta[name="theme-color"]').forEach(m => {
         if (!m.dataset.base) m.dataset.base = m.content;
         m.content = e.data.on ? (dark ? '#131923' : '#919397') : m.dataset.base;
