@@ -2,26 +2,37 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>NODE</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="manifest" href="manifest.webmanifest">
+<!-- ホーム画面から開いたとき、アドレスバーのない全画面で表示する -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="NODE">
-<meta name="theme-color" content="#b8452f">
+<meta name="theme-color" content="#ffffff">
 <script>
-  // ▼ ここに名刺アプリ（GAS）のURL（末尾が /exec）を貼り付ける
-    const APP_URL = 'https://script.google.com/macros/s/AKfycbw1THJBDI-YepBslIcWDfHoKHM4_LDK3bAuWogH0zUbrd1wD8IykITSEmkCyvT30w/exec';
+  // ▼▼▼ ここを書き換える：'' の中に、NODE（GAS）の /exec で終わるURLを丸ごと貼る ▼▼▼
+  const APP_URL = 'https://script.google.com/macros/s/AKfycbw1THJBDI-YepBslIcWDfHoKHM4_LDK3bAuWogH0zUbrd1wD8IykITSEmkCyvT30w/exec';
+  // ▲▲▲ 例：const APP_URL = 'https://script.google.com/macros/s/AKfy……/exec'; ▲▲▲
 
-  // ホーム画面のアイコンから開いたとき（URLに ?launch=1 が付いている）は、すぐに名刺アプリへ移動する
-  if (/[?&]launch=1/.test(location.search)) location.replace(APP_URL);
+  // 表示のしかた
+  //   ホーム画面のアイコンから開いたとき（?launch=1）：全画面の中にNODEを表示する
+  //   ?launch=1&mode=go のとき：NODEのページへ移動する（全画面表示がうまくいかないときの予備）
+  const q = location.search;
+  const LAUNCH = /[?&]launch=1/.test(q);
+  if (LAUNCH && /[?&]mode=go/.test(q)) location.replace(APP_URL);
 </script>
 <style>
   :root{--bg:#f3f5f8;--surface:#fff;--ink:#1b2333;--muted:#5d677a;--line:#dde2ea;--ai:#22406e;--shu:#b8452f}
   @media (prefers-color-scheme: dark){:root{--bg:#12161e;--surface:#1b212c;--ink:#e7ebf2;--muted:#9aa4b6;--line:#2c3443;--ai:#8fb0e6;--shu:#e48a73}}
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","Yu Gothic UI","Meiryo",system-ui,sans-serif;line-height:1.7}
+  [hidden]{display:none!important}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","Yu Gothic UI","Meiryo",system-ui,sans-serif;line-height:1.7}
   main{max-width:440px;margin:0 auto;padding:40px max(20px,env(safe-area-inset-left)) 40px max(20px,env(safe-area-inset-right));display:flex;flex-direction:column;gap:18px}
   .logo{display:flex;align-items:center;gap:12px}
   .logo img{width:56px;height:56px;border-radius:12px}
@@ -32,10 +43,21 @@
   ol{margin:0;padding-left:1.3em}
   .btn{display:block;text-align:center;background:var(--ai);color:#fff;text-decoration:none;font-weight:700;padding:14px;border-radius:999px}
   .note{font-size:12px;color:var(--muted)}
+  /* 全画面表示 */
+  #app{position:fixed;inset:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);background:#fff}
+  #app iframe{width:100%;height:100%;border:0;display:block}
+  #app .loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#5d677a;font-size:13px;pointer-events:none}
+  #app .loading img{width:64px;height:64px;border-radius:14px}
+  #app .fallback{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 24px);text-align:center;font-size:12px;pointer-events:auto}
+  #app .fallback a{color:#22406e}
 </style>
 </head>
 <body>
-<main>
+<div id="app" hidden>
+  <div class="loading" id="loading"><img src="icon-192.png" alt=""><span>NODEを開いています…</span>
+    <div class="fallback" id="fallback" hidden>開かないときは <a href="?launch=1&amp;mode=go">こちら</a></div></div>
+</div>
+<main id="guide">
   <div class="logo"><img src="icon-192.png" alt=""><div><b>NODE</b><small>名刺・人脈管理</small></div></div>
   <p style="margin:0">このページをホーム画面に追加すると、アイコンからNODEを開けるようになります。</p>
   <div class="card">
@@ -44,15 +66,49 @@
   </div>
   <div class="card">
     <h2>Android（Chrome）</h2>
-    <ol><li>右上の「︙」を押す</li><li>「ホーム画面に追加」を選ぶ</li><li>名前が「NODE」になっていることを確認して「追加」</li></ol>
+    <ol><li>右上の「︙」を押す</li><li>「ホーム画面に追加」（または「アプリをインストール」）を選ぶ</li><li>名前が「NODE」になっていることを確認して「追加」</li></ol>
   </div>
   <a class="btn" id="open" href="#">追加せずにNODEを開く</a>
-  <p class="note">ホーム画面のアイコンから開くと、自動でNODEに移動します。</p>
+  <p class="note">ホーム画面のアイコンから開くと、アドレスバーのない画面でNODEが開きます。</p>
 </main>
 <script>
   document.getElementById('open').href = APP_URL;
-  // ホーム画面に追加されるURLに「?launch=1」を付けておく（アイコンから開いたときに自動で移動させるため）
-  try { history.replaceState(null, '', location.pathname + '?launch=1'); } catch (e) {}
+  // NODEの鍵（この端末の登録情報）を、ホーム画面のアプリ側で預かる。
+  // iPhoneでは、はめ込んだGoogleのページの保存データが閉じるたびに消えるため。
+  // やり取りするのはGoogleのNODEの画面（*.googleusercontent.com）だけ。
+  const CRED_KEY = 'node_cred_v1';
+  const NODE_ORIGIN = /^https:\/\/[a-z0-9-]+script\.googleusercontent\.com$/;
+  window.addEventListener('message', e => {
+    if (!NODE_ORIGIN.test(e.origin) || !e.data || typeof e.data !== 'object') return;
+    if (e.data.type === 'node-get') {
+      let cred = null;
+      try { cred = JSON.parse(localStorage.getItem(CRED_KEY) || 'null'); } catch (err) {}
+      e.source.postMessage({ type: 'node-cred', cred }, e.origin);
+    } else if (e.data.type === 'node-save') {
+      try {
+        if (e.data.cred) localStorage.setItem(CRED_KEY, JSON.stringify(e.data.cred));
+        else localStorage.removeItem(CRED_KEY);
+      } catch (err) {}
+    }
+  });
+
+  if (LAUNCH) {
+    // 全画面の中にNODEを表示する
+    document.getElementById('guide').hidden = true;
+    const app = document.getElementById('app');
+    app.hidden = false;
+    const f = document.createElement('iframe');
+    f.src = APP_URL;
+    f.title = 'NODE';
+    f.allow = 'camera; clipboard-write';
+    f.onload = () => { document.getElementById('loading').style.display = 'none'; };
+    app.appendChild(f);
+    // 長く読み込みが終わらないときは、予備の開き方を案内する
+    setTimeout(() => { document.getElementById('fallback').hidden = false; }, 8000);
+  } else {
+    // ホーム画面に追加されるURLに「?launch=1」を付けておく
+    try { history.replaceState(null, '', location.pathname + '?launch=1'); } catch (e) {}
+  }
 </script>
 </body>
 </html>
